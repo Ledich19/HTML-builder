@@ -21,7 +21,10 @@ function copyFiles(pathFrom, pathTo) {
       const files = await readdir(pathFrom, { withFileTypes: true });
       for (const file of files) {
         if (file.isDirectory()) {
-          copyFiles(path.join(pathFrom, file.name), path.join(pathTo, file.name));
+          copyFiles(
+            path.join(pathFrom, file.name),
+            path.join(pathTo, file.name)
+          );
         } else {
           copyFile(
             path.join(pathFrom, file.name),
@@ -88,7 +91,6 @@ async function margeHtml(html) {
             writeFile(pathDistHTML, fileHtml, (error) => {
               if (error) return console.error(error.message);
             });
-            console.log("contents");
           } catch (err) {
             console.error(err.message);
           }
