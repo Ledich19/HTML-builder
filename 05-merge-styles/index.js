@@ -3,6 +3,7 @@ const { readdir } = require("fs/promises");
 const path = require("path");
 
 const pathDir = path.join(__dirname, "styles");
+const pathDist = path.join(__dirname, "project-dist", "bundle.css");
 
 async function logFiles(params) {
   try {
@@ -16,15 +17,11 @@ async function logFiles(params) {
           .on("data", (chunk) => (data += chunk))
           .on("end", () => {
             arr.push(data);
-            writeFile(
-              path.join(__dirname, "project-dist", "bundle.css"),
-              arr.join("\n"),
-              (error) => {
-                if (error) return console.error(error.message);
-              }
-            );
+            writeFile(pathDist, arr.join("\n"), (err) => {
+              if (err) return console.error(error.message);
+            });
           })
-          .on("error", (error) => console.log("Error", error.message));
+          .on("error", (err) => console.log("Error", error.message));
       }
     }
   } catch (err) {
