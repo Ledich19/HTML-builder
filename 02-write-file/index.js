@@ -1,20 +1,23 @@
 const readline = require("readline");
+const fs = require("fs");
 const path = require("path");
+const { stdin: input, stdout: output } = require("process");
 
 const pathText = path.join(__dirname, "text.txt");
-const { stdin: input, stdout: output } = require("process");
-const fs = require("fs");
 const rl = readline.createInterface({ input, output });
 
-rl.question("\u001B[34m Write new task \n\u001B[0m", (answer) => {
+function writeFileFoo(path, answer) {
+  fs.writeFile(path, answer, (error) => {
+    if (error) return console.error(error.message);
+  });
+}
+
+writeFileFoo(pathText, "");
+rl.question("\u001B[33m Write new task \n\u001B[0m", (answer) => {
   if (answer === "exit") {
     rl.close();
   }
-
-  fs.writeFile(pathText, answer, (error) => {
-    if (error) return console.error(error.message);
-  });
-
+  writeFileFoo(pathText, answer);
   rl.on("line", (input) => {
     if (input === "exit") {
       rl.close();
@@ -23,14 +26,12 @@ rl.question("\u001B[34m Write new task \n\u001B[0m", (answer) => {
 
   rl.on("history", (history) => {
     const data = [...history].reverse().join("\n");
-    fs.writeFile(pathText, data, (error) => {
-      if (error) return console.error(error.message);
-    });
+    writeFileFoo(pathText, data);
   });
 });
 
 rl.on("close", (code) => {
-  console.log(`\u001B[34m \nBye:)\n \u001B[0m`);
+  console.log(`\u001B[33m \nBye:) have a good day\n \u001B[0m`);
 });
 process.on("SIGINT", () => {
   rl.close();
