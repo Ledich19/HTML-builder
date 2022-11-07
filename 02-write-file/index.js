@@ -23,7 +23,6 @@ rl.question("\u001B[33m Write new task \n\u001B[0m", (answer) => {
       rl.close();
     }
   });
-
   rl.on("history", (history) => {
     const data = [...history].reverse().join("\n");
     writeFileFoo(pathText, data);

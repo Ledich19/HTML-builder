@@ -1,32 +1,26 @@
-const { copyFile, constants, mkdir, rmdir, stat, unlink } = require("fs");
-const { readdir } = require("fs/promises");
+const { copyFile, mkdir } = require("fs");
+const { readdir, unlink } = require("node:fs/promises");
 const path = require("path");
 
 const pathDir = path.join(__dirname, "files");
 const pathCopy = path.join(__dirname, "files-copy");
 
-function clearFolder() {
-  stat(pathCopy, async function (err) {
-    if (!err) {
-      const files = await readdir(pathCopy, { withFileTypes: true });
-      for (const file of files) {
-        const filePath = path.join(pathCopy, file.name);
-        unlink(filePath, (err) => {
-          if (err) throw err;
-        });
-      }
-    } else if (err.code === "ENOENT") {
-      mkdir(pathCopy, (err) => {
-        if (err) throw err;
-      });
-    } else {
-      console.error(err);
-    }
-  });
-}
-
 async function copyFiles() {
-  clearFolder();
+  mkdir(pathCopy, { recursive: true }, (err) => {
+    if (err) throw err;
+  });
+
+  const files = await readdir(pathCopy, { withFileTypes: true });
+  for (const file of files) {
+    const filePath = path.join(pathCopy, file.name);
+    try {
+      await unlink(filePath);
+      console.log("del");
+    } catch (error) {
+      console.error("there was an error:", error.message);
+    }
+  }
+
   try {
     const files = await readdir(pathDir, { withFileTypes: true });
     for (const file of files) {
