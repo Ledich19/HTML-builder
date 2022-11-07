@@ -5,7 +5,7 @@ const path = require("path");
 const pathDir = path.join(__dirname, "styles");
 const pathDist = path.join(__dirname, "project-dist", "bundle.css");
 
-async function logFiles(params) {
+async function logFiles() {
   try {
     const files = await readdir(pathDir, { withFileTypes: true });
     const arr = [];
