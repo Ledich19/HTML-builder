@@ -1,13 +1,6 @@
-const {
-  createReadStream,
-  writeFile,
-  mkdir,
-  copyFile,
-  constants,
-} = require("fs");
-const { readdir, readFile } = require("fs/promises");
+const { createReadStream, mkdir, copyFile, constants } = require("fs");
+const { readdir, readFile, writeFile } = require("fs/promises");
 const path = require("path");
-
 const pathTemplate = path.join(__dirname, "template.html");
 const pathDistBundleDir = path.join(__dirname, "project-dist");
 const pathDistHTML = path.join(__dirname, "project-dist", "index.html");
@@ -75,27 +68,28 @@ async function margeCss(params) {
 
 async function margeHtml(html) {
   let fileHtml = html;
-  const regexp = /{{([\s\S]+?)}}/g;
-  const tags = await html.match(regexp).map((s) => s.slice(2, s.length - 2));
+  //const regexp = /{{([\s\S]+?)}}/g;
   try {
     const files = await readdir(pathComponents, { withFileTypes: true });
     for (const file of files) {
-      tags.forEach(async (t) => {
-        if (file.name === t + ".html") {
+      if (path.extname(file.name) === ".html") {
+        try {
+          const contents = await readFile(
+            path.join(pathComponents, file.name),
+            { encoding: "utf8" }
+          );
+          const tag = file.name.replace(path.extname(file.name), "");
+          fileHtml = fileHtml.replace(`{{${tag}}}`, contents);
           try {
-            const contents = await readFile(
-              path.join(pathComponents, file.name),
-              { encoding: "utf8" }
-            );
-            fileHtml = fileHtml.replace(`{{${t}}}`, contents);
-            writeFile(pathDistHTML, fileHtml, (error) => {
-              if (error) return console.error(error.message);
-            });
+            const promise = writeFile(pathDistHTML, fileHtml);
+            await promise;
           } catch (err) {
-            console.error(err.message);
+            console.error(err);
           }
+        } catch (err) {
+          console.error(err.message);
         }
-      });
+      }
     }
   } catch (err) {
     console.error(err);
