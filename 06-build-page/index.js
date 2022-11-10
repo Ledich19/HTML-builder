@@ -1,5 +1,5 @@
 const { createReadStream, mkdir, copyFile, constants } = require("fs");
-const { readdir, readFile, writeFile } = require("fs/promises");
+const { readdir, readFile, writeFile,unlink } = require("fs/promises");
 const path = require("path");
 const pathTemplate = path.join(__dirname, "template.html");
 const pathDistBundleDir = path.join(__dirname, "project-dist");
@@ -7,9 +7,22 @@ const pathDistHTML = path.join(__dirname, "project-dist", "index.html");
 const pathComponents = path.join(__dirname, "components");
 const pathStileFrom = path.join(__dirname, "styles");
 
+
 function copyFiles(pathFrom, pathTo) {
+
   mkdir(pathTo, { recursive: true }, async (err) => {
     if (err) throw err;
+
+    const files = await readdir(pathTo, { withFileTypes: true });
+    for (const file of files) {
+      const filePath = path.join(pathTo, file.name);
+      try {
+        await unlink(filePath);
+      } catch (error) {
+        console.error("there was an error:", error.message);
+      }
+    }
+
     try {
       const files = await readdir(pathFrom, { withFileTypes: true });
       for (const file of files) {
